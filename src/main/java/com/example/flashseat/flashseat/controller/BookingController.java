@@ -1,11 +1,14 @@
 package com.example.flashseat.flashseat.controller;
 
+
 import com.example.flashseat.flashseat.model.Booking;
 import com.example.flashseat.flashseat.service.BookingService;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/bookings")
+@SecurityRequirement(name = "Bearer Authentication")
 public class BookingController {
 
     private final BookingService bookingService;
