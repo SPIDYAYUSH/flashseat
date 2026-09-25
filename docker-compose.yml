@@ -2,10 +2,19 @@ services:
   flashseat-app:
     image: flashseat:1.0
     container_name: flashseat-app
+
     ports:
       - "8080:8080"
+
     environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
     restart: unless-stopped

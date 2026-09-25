@@ -54,12 +54,13 @@ public class SecurityConfig {
                         .requestMatchers("/user").permitAll()
                         .requestMatchers("/events/**").permitAll()
 
-                        // Swagger
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
+
+                        .requestMatchers("/actuator/health").permitAll()
 
                         .anyRequest().authenticated()
                 )

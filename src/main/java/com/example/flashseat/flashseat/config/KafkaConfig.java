@@ -21,6 +21,42 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
+    private String bootstrapServers() {
+        return System.getenv()
+                .getOrDefault("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092");
+    }
+
+    private void addSecurityConfig(Map<String, Object> config) {
+
+        String securityProtocol =
+                System.getenv().getOrDefault("KAFKA_SECURITY_PROTOCOL", "PLAINTEXT");
+
+        config.put("security.protocol", securityProtocol);
+
+        String saslMechanism =
+                System.getenv().getOrDefault("KAFKA_SASL_MECHANISM", "");
+
+        String username =
+                System.getenv().getOrDefault("KAFKA_USERNAME", "");
+
+        String password =
+                System.getenv().getOrDefault("KAFKA_PASSWORD", "");
+
+        if (!saslMechanism.isBlank()) {
+            config.put("sasl.mechanism", saslMechanism);
+        }
+
+        if (!username.isBlank() && !password.isBlank()) {
+
+            config.put(
+                    "sasl.jaas.config",
+                    "org.apache.kafka.common.security.scram.ScramLoginModule required "
+                            + "username=\"" + username + "\" "
+                            + "password=\"" + password + "\";"
+            );
+        }
+    }
+
     // =========================
     // PRODUCER
     // =========================
@@ -32,7 +68,7 @@ public class KafkaConfig {
 
         config.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "host.docker.internal:9092"
+                bootstrapServers()
         );
 
         config.put(
@@ -45,6 +81,8 @@ public class KafkaConfig {
                 StringSerializer.class
         );
 
+        addSecurityConfig(config);
+
         return new DefaultKafkaProducerFactory<>(config);
     }
 
@@ -52,7 +90,6 @@ public class KafkaConfig {
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-
 
     // =========================
     // CONSUMER
@@ -65,7 +102,7 @@ public class KafkaConfig {
 
         config.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "host.docker.internal:9092"
+                bootstrapServers()
         );
 
         config.put(
@@ -88,9 +125,10 @@ public class KafkaConfig {
                 "earliest"
         );
 
+        addSecurityConfig(config);
+
         return new DefaultKafkaConsumerFactory<>(config);
     }
-
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String>
