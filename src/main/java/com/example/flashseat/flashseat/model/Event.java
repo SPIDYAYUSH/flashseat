@@ -1,5 +1,6 @@
 package com.example.flashseat.flashseat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class Event {
 
     private int totalSeats;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Seat> seats;
 
